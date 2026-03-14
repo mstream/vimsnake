@@ -38,6 +38,7 @@
       {
         devShells.default = pkgs.mkShell {
           packages = [
+            pkgs.nodejs_20
             pkgs2511.github-copilot-cli
             pkgs.opencode
             pkgs.spec-kit
