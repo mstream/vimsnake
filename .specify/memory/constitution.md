@@ -1,14 +1,14 @@
 <!--
 Sync Impact Report
 ==================
-Version change: NONE → 1.0.0
-Modified principles: N/A (initial constitution)
+Version change: 1.0.0 → 1.1.0
+Modified principles: None
 Added sections:
-  - Core Principles (5 principles)
-  - Naming Standards
-  - Code Quality Gates
-  - Governance
-Removed sections: N/A
+  - VI. User Acceptance Test Priority (new)
+  - VII. Test Scenarios as Code (new)
+  - VIII. Continuous Test Validation (new)
+  - Testing Standards (new section)
+Removed sections: None
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ (Constitution Check section compatible)
   - .specify/templates/spec-template.md ✅ (Requirements section compatible)
@@ -82,6 +82,42 @@ Every code construct MUST communicate its purpose through its name, structure, a
 
 **Rationale:** Clear structure enables readers to navigate codebases without mental mapping. When code organization reflects domain concepts, developers can locate functionality intuitively.
 
+### VI. User Acceptance Test Priority (NON-NEGOTIABLE)
+
+Test effort MUST prioritize high-level user acceptance tests over low-level unit tests.
+
+**Rules:**
+- Test suite MUST include user acceptance tests that validate complete user workflows
+- User acceptance tests MUST be written before unit tests when new features are developed
+- Unit tests MAY be added only when user acceptance tests provide insufficient coverage of edge cases
+- Test coverage metrics MUST weight user acceptance tests higher than unit tests
+
+**Rationale:** User acceptance tests verify behavior that users actually experience. Low-level unit tests verify implementation details that may change without affecting user outcomes. Prioritizing user acceptance tests ensures testing effort delivers actual value to users and catches regressions that matter.
+
+### VII. Test Scenarios as Code
+
+Every important feature MUST have at least one test scenario versioned as code in the repository.
+
+**Rules:**
+- Test scenarios MUST be executable automated tests, not manual checklists
+- Test scenarios MUST be stored in the repository alongside application code
+- Test scenarios MUST be version-controlled with the same commit workflow as application code
+- New features MUST include test scenarios in the same pull request as the implementation
+
+**Rationale:** Tests that exist only outside version control drift from implementation, become stale, or are lost entirely. Versioned tests ensure that anyone can reproduce validation of any feature at any point in the project history. Code-reviewed tests maintain quality standards equal to application code.
+
+### VIII. Continuous Test Validation
+
+Every change to application code MUST be validated by running all available tests.
+
+**Rules:**
+- All tests MUST pass before merging any change to application code
+- Test execution MUST be automated and required for every pull request
+- Failing tests MUST block merge until resolved
+- Test suite execution time MUST stay within acceptable limits for continuous integration
+
+**Rationale:** Running all tests on every change catches regressions immediately when they are cheapest to fix. Selective test execution based on changed files creates false confidence and allows regressions to slip through. Complete test validation ensures the system works as a whole, not just in isolated components.
+
 ## Naming Standards
 
 ### Constants
@@ -123,13 +159,51 @@ type OrderFulfillmentStatus = 'pending' | 'processing' | 'shipped' | 'delivered'
 
 ### Files
 
-Files MUST be named to clearly indicate their contents using the project's约定的 case convention (typically `kebab-case` for modules, `PascalCase` for components):
+Files MUST be named to clearly indicate their contents using the project's case convention (typically `kebab-case` for modules, `PascalCase` for components):
 
 ```
 customer-order-processor.ts
 customer-authentication-credentials.interface.ts
 order-fulfillment-status.type.ts
 ```
+
+## Testing Standards
+
+### Test Hierarchy
+
+Tests MUST be organized in priority order:
+
+1. **User Acceptance Tests (Highest Priority)**: Validate complete user workflows end-to-end
+2. **Integration Tests**: Validate component interactions and API contracts
+3. **Unit Tests (Lowest Priority)**: Validate isolated functions and edge cases
+
+### Test Naming
+
+Test names MUST describe the scenario being validated:
+
+```typescript
+function rejectsInvalidEmailAddress() {}
+function createsOrderWhenItemsAreInStock() {}
+function sendsNotificationAfterSuccessfulPayment() {}
+```
+
+### Test Independence
+
+Each test scenario MUST be independently executable:
+
+**Rules:**
+- Tests MUST NOT depend on execution order
+- Tests MUST NOT share mutable state
+- Each test MUST set up its own fixtures
+- Each test MUST clean up after itself
+
+### Test Coverage Requirements
+
+**Rules:**
+- All user-facing features MUST have user acceptance test coverage
+- Critical business logic MUST have integration test coverage
+- Unit tests MAY cover edge cases not reachable through higher-level tests
+- Coverage reports MUST distinguish between user acceptance, integration, and unit test coverage
 
 ## Code Quality Gates
 
@@ -138,14 +212,15 @@ All code MUST pass the following quality gates before merge:
 - **Naming Review**: All identifiers reviewed for clarity and descriptiveness
 - **Abbreviation Check**: Automated scan for common abbreviation patterns
 - **Comment Detection**: Automated lint rule flagging any comment presence
-- **Readability Assessment**: Peer review confirming code is understandable withoutComments
+- **Readability Assessment**: Peer review confirming code is understandable without comments
+- **Test Validation**: All tests MUST pass with zero failures
 
 ## Governance
 
 This constitution establishes non-negotiable standards for code quality in the VimSnake project. All changes to this constitution require:
 
 1. Documentation of the proposed amendment
-2. Rationale explaining why the change improves code clarity
+2. Rationale explaining why the change improves code clarity or reliability
 3. Review by at least one project maintainer
 4. Version increment following semantic versioning
 
@@ -160,4 +235,4 @@ This constitution establishes non-negotiable standards for code quality in the V
 - Non-compliant code MUST be refactored before merge
 - No exceptions granted without documented architectural justification
 
-**Version**: 1.0.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-14
+**Version**: 1.1.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-14
