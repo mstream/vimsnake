@@ -1,13 +1,12 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 1.1.0
+Version change: 1.1.0 → 1.2.0
 Modified principles: None
 Added sections:
-  - VI. User Acceptance Test Priority (new)
-  - VII. Test Scenarios as Code (new)
-  - VIII. Continuous Test Validation (new)
-  - Testing Standards (new section)
+  - IX. Reproducible Development Environment (new)
+  - X. Pinned Dependency Versions (new)
+  - Dependency Standards (new section)
 Removed sections: None
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ (Constitution Check section compatible)
@@ -118,6 +117,32 @@ Every change to application code MUST be validated by running all available test
 
 **Rationale:** Running all tests on every change catches regressions immediately when they are cheapest to fix. Selective test execution based on changed files creates false confidence and allows regressions to slip through. Complete test validation ensures the system works as a whole, not just in isolated components.
 
+### IX. Reproducible Development Environment
+
+Every executable program used for building or testing the application MUST be available at the same version across all environments.
+
+**Rules:**
+- Build tools and testing frameworks MUST NOT be assumed to be pre-installed on any machine
+- All development tools MUST be declared in a Nix Shell definition (`shell.nix` or `flake.nix`)
+- Tool versions MUST be explicitly pinned in the Nix configuration
+- Running `nix-shell` or `nix develop` MUST produce an environment with all required tools at declared versions
+- Different developers and build servers MUST execute builds with identical tool versions
+
+**Rationale:** Environment inconsistencies cause subtle bugs that waste hours debugging. Version mismatches between developer machines and CI servers lead to "works on my machine" problems. Declaring all dependencies in Nix ensures reproducibility across any machine, eliminates environment-specific failures, and enables deterministic builds from any point in history.
+
+### X. Pinned Dependency Versions
+
+All software dependencies including libraries, packages, and container images MUST use specific, pinned versions to guarantee consistent builds and tests.
+
+**Rules:**
+- Library dependencies MUST specify exact version numbers, not ranges
+- Container images MUST reference specific digests or immutable version tags
+- Version specifications MUST be locked in dependency manifests (e.g., `package-lock.json`, `Cargo.lock`, `go.sum`)
+- Updating a dependency MUST be an explicit, reviewed action with a recorded rationale
+- Transitive dependency versions MUST also be locked and reproducible
+
+**Rationale:** Loose version constraints introduce unpredictability. A library update can silently change behavior or introduce bugs without any code change on the consuming side. Pinned versions ensure that builds and tests execute identically regardless of when or where they run. Version updates become deliberate decisions with full visibility into what changed and why.
+
 ## Naming Standards
 
 ### Constants
@@ -205,6 +230,60 @@ Each test scenario MUST be independently executable:
 - Unit tests MAY cover edge cases not reachable through higher-level tests
 - Coverage reports MUST distinguish between user acceptance, integration, and unit test coverage
 
+## Dependency Standards
+
+### Development Tools
+
+Development and build tools MUST be declared in Nix configuration:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+  };
+  outputs = { nixpkgs, ... }: {
+    devShells.default = pkgs.mkShell {
+      packages = [
+        pkgs.nodejs_20
+        pkgs.typescript
+        pkgs.playwright
+      ];
+    };
+  };
+}
+```
+
+### Library Dependencies
+
+Library dependencies MUST be pinned to exact versions in lock files:
+
+```json
+{
+  "dependencies": {
+    "express": "4.21.0",
+    "lodash": "4.17.21"
+  }
+}
+```
+
+### Container Images
+
+Container images MUST reference specific digests:
+
+```dockerfile
+FROM node:20.11.0@sha256:abc123...
+```
+
+### Dependency Updates
+
+Dependency updates MUST follow a deliberate process:
+
+1. Identify the specific dependency and version to update
+2. Review changelog and breaking changes
+3. Update version in manifest and lock file
+4. Run full test suite to validate compatibility
+5. Document the update reason in commit message
+
 ## Code Quality Gates
 
 All code MUST pass the following quality gates before merge:
@@ -214,6 +293,7 @@ All code MUST pass the following quality gates before merge:
 - **Comment Detection**: Automated lint rule flagging any comment presence
 - **Readability Assessment**: Peer review confirming code is understandable without comments
 - **Test Validation**: All tests MUST pass with zero failures
+- **Dependency Validation**: All dependencies MUST be pinned to specific versions
 
 ## Governance
 
@@ -235,4 +315,4 @@ This constitution establishes non-negotiable standards for code quality in the V
 - Non-compliant code MUST be refactored before merge
 - No exceptions granted without documented architectural justification
 
-**Version**: 1.1.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-14
+**Version**: 1.2.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-14
