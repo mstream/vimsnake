@@ -100,13 +100,15 @@ export function renderGridLines(metrics: ReturnType<typeof calculateGridRenderMe
   renderingContext.stroke();
 }
 
-export function initializeGridRenderer(): void {
-  initializeCanvas();
+export function initializeGridRenderer(): HTMLCanvasElement {
+  const canvasElement = initializeCanvas();
   const viewportDimensions = getViewportDimensions();
   const gridMetrics = calculateGridRenderMetrics(viewportDimensions);
   
   renderGridBackground(gridMetrics);
   renderGridLines(gridMetrics);
+  
+  return canvasElement;
 }
 
 export function handleViewportResize(): void {
