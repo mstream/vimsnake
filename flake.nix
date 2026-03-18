@@ -36,6 +36,9 @@
             pkgs.opencode
             pkgs.spec-kit
           ];
+          shellHook = ''
+            npm ci
+          '';
         };
       }
     );

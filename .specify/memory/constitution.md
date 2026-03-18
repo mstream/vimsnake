@@ -1,12 +1,10 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.1.0 → 1.2.0
+Version change: 1.2.0 → 1.3.0
 Modified principles: None
 Added sections:
-  - IX. Reproducible Development Environment (new)
-  - X. Pinned Dependency Versions (new)
-  - Dependency Standards (new section)
+  - XI. Cross-Browser Compatibility (new)
 Removed sections: None
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ (Constitution Check section compatible)
@@ -143,6 +141,19 @@ All software dependencies including libraries, packages, and container images MU
 
 **Rationale:** Loose version constraints introduce unpredictability. A library update can silently change behavior or introduce bugs without any code change on the consuming side. Pinned versions ensure that builds and tests execute identically regardless of when or where they run. Version updates become deliberate decisions with full visibility into what changed and why.
 
+### XI. Cross-Browser Compatibility (NON-NEGOTIABLE)
+
+The application MUST function correctly on all modern browsers, and all user acceptance tests MUST execute on each supported browser.
+
+**Rules:**
+- Supported browsers MUST include: Google Chrome (latest), Mozilla Firefox (latest), Microsoft Edge (latest), and Apple Safari (latest)
+- All user acceptance tests MUST have configurations for each supported browser
+- Continuous integration MUST run acceptance tests on all supported browsers for every pull request
+- Browser-specific workarounds MUST NOT be used unless a browser bug is documented with a reference to the browser vendor's issue tracker
+- Features that cannot be implemented cross-browser MUST be explicitly documented with the technical limitation and affected browsers
+
+**Rationale:** Users choose browsers based on personal preference, organizational policy, or platform constraints. An application that works only in one browser excludes users and limits adoption. Cross-browser testing ensures consistent user experience across the entire user base and prevents embarrassing bugs that appear only in specific browsers. Modern web standards enable cross-browser compatibility; deviations indicate either an unusual edge case or insufficient testing discipline.
+
 ## Naming Standards
 
 ### Constants
@@ -230,6 +241,16 @@ Each test scenario MUST be independently executable:
 - Unit tests MAY cover edge cases not reachable through higher-level tests
 - Coverage reports MUST distinguish between user acceptance, integration, and unit test coverage
 
+### Cross-Browser Test Configuration
+
+User acceptance tests MUST be configured to run on all supported browsers:
+
+**Rules:**
+- Test configuration MUST define projects for Chrome, Firefox, Edge, and Safari
+- Each browser project MUST use the official Playwright device configurations
+- Test runners MUST execute against all browser projects by default
+- CI pipelines MUST include all browser configurations
+
 ## Dependency Standards
 
 ### Development Tools
@@ -294,6 +315,7 @@ All code MUST pass the following quality gates before merge:
 - **Readability Assessment**: Peer review confirming code is understandable without comments
 - **Test Validation**: All tests MUST pass with zero failures
 - **Dependency Validation**: All dependencies MUST be pinned to specific versions
+- **Cross-Browser Validation**: All user acceptance tests MUST pass on all supported browsers
 
 ## Governance
 
@@ -315,4 +337,4 @@ This constitution establishes non-negotiable standards for code quality in the V
 - Non-compliant code MUST be refactored before merge
 - No exceptions granted without documented architectural justification
 
-**Version**: 1.2.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-14
+**Version**: 1.3.0 | **Ratified**: 2026-03-14 | **Last Amended**: 2026-03-18
