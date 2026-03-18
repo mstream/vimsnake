@@ -151,6 +151,7 @@ test.describe('Snake Movement - User Story 2: Direction Change with VIM Keys', (
   });
 
   test('pressing k turns snake up - snake moves up after tick', async ({ page }) => {
+    await page.keyboard.press('l');
     await page.keyboard.press('k');
     await page.waitForTimeout(1100);
     
@@ -231,6 +232,7 @@ test.describe('Snake Movement - User Story 3: Directional Constraint', () => {
   });
 
   test('pressing down (j) while moving up is ignored - snake continues up', async ({ page }) => {
+    await page.keyboard.press('l');
     await page.keyboard.press('k');
     await page.waitForTimeout(1100);
     
@@ -333,7 +335,6 @@ test.describe('Snake Movement - User Story 4: Single Direction Queue', () => {
 
   test('valid turn sequence: down -> queue right -> queue up results in turning up after right', async ({ page }) => {
     await page.keyboard.press('l');
-    await page.keyboard.press('k');
     await page.waitForTimeout(1100);
     
     const afterFirstTick = await page.evaluate(() => {
@@ -341,10 +342,11 @@ test.describe('Snake Movement - User Story 4: Single Direction Queue', () => {
       return getSnakeState ? getSnakeState() : null;
     });
     
-    expect(afterFirstTick.currentDirection).toBe('up');
+    expect(afterFirstTick.currentDirection).toBe('right');
     expect(afterFirstTick.body[0].x).toBe(17);
     expect(afterFirstTick.body[0].y).toBe(16);
     
+    await page.keyboard.press('k');
     await page.waitForTimeout(1000);
     
     const afterSecondTick = await page.evaluate(() => {
@@ -352,7 +354,9 @@ test.describe('Snake Movement - User Story 4: Single Direction Queue', () => {
       return getSnakeState ? getSnakeState() : null;
     });
     
+    expect(afterSecondTick.currentDirection).toBe('up');
     expect(afterSecondTick.body[0].y).toBeLessThan(afterFirstTick.body[0].y);
+    expect(afterSecondTick.body[0].x).toBe(17);
   });
 
   test('reversal blocked even with pending direction: down -> queue right -> left is blocked', async ({ page }) => {

@@ -8,14 +8,12 @@
   inputs = {
     flake-utils.url = "github:numtide/flake-utils/main";
     nixpkgs.url = "github:nixos/nixpkgs/master";
-    nixpkgs2511.url = "github:nixos/nixpkgs/nixos-25.11";
   };
 
   outputs =
     {
       flake-utils,
       nixpkgs,
-      nixpkgs2511,
       ...
     }:
     let
@@ -30,16 +28,11 @@
         pkgs = import nixpkgs {
           inherit system;
         };
-        pkgs2511 = import nixpkgs2511 {
-          inherit system;
-          config.allowUnfree = true;
-        };
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            pkgs.nodejs_20
-            pkgs2511.github-copilot-cli
+            pkgs.nodejs_22
             pkgs.opencode
             pkgs.spec-kit
           ];
