@@ -62,9 +62,11 @@ export function applyPendingDirection(state: SnakeState): SnakeState {
   };
 }
 
-export function moveSnake(state: SnakeState): SnakeState {
+export function moveSnake(state: SnakeState, isGrowing: boolean = false): SnakeState {
   const newHead = calculateNextHeadPosition(state.body[0], state.currentDirection);
-  const newBody = [newHead, ...state.body.slice(0, -1)];
+  const newBody = isGrowing 
+    ? [newHead, ...state.body]
+    : [newHead, ...state.body.slice(0, -1)];
   
   return {
     ...state,
