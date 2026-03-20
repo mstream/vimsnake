@@ -8,7 +8,7 @@
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",
     "test:acceptance": "playwright test",
-    "prepare": "playwright install",
+    "prepare": "playwright install --with-deps",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },

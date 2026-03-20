@@ -1,6 +1,6 @@
 # vimsnake Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-18
+Auto-generated from all feature plans. Last updated: 2026-03-19
 
 ## Active Technologies
 - TypeScript 5.x (ES2022 target) + Vite 5.1.6, Vitest 1.3.1, Playwright 1.42.1 (002-snake-control)
@@ -28,9 +28,9 @@ npm test && npm run lint
 TypeScript 5.x (ES2022target): Follow standard conventions
 
 ## Recent Changes
+- 004-collision-detection: Added TypeScript 5.x (ES2022 target) + Vite 5.1.6 (build), Vitest 1.3.1 (unit tests), Playwright 1.42.1 (acceptance tests), Canvas API (rendering)
 - 003-food-spawning: Added TypeScript 5.x (ES2022 target) + Vite 5.1.6 (build), Vitest 1.3.1 (unit tests), Playwright 1.42.1 (acceptance tests), Canvas API (rendering)
 - 002-snake-control: Added TypeScript 5.x (ES2022 target) + Vite 5.1.6 (build), Vitest 1.3.1 (unit tests), Playwright 1.42.1 (acceptance tests)
-- 002-snake-control: Added TypeScript 5.x (ES2022 target) + Vite 5.1.6, Vitest 1.3.1, Playwright 1.42.1
 
 
 <!-- MANUAL ADDITIONS START -->

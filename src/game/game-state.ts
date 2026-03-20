@@ -9,6 +9,11 @@ export function createInitialGameState(): GameState {
   return {
     snakeState,
     foodState,
-    isSnakeGrowing: false
+    isSnakeGrowing: false,
+    gameStatus: 'playing'
   };
+}
+
+export function restartGame(): GameState {
+  return createInitialGameState();
 }

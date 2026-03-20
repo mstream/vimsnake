@@ -1,14 +1,17 @@
 import type { GameState } from './game-types';
-import { createInitialGameState } from './game-state';
+import { createInitialGameState, restartGame } from './game-state';
 import { initializeKeyboardInput, getCurrentSnakeState, updateSnakeState, cleanupKeyboardInput } from '../snake/keyboard-input';
 import { applyPendingDirection, moveSnake } from '../snake/snake-state';
 import { renderSnake, cleanupSnakeRenderer } from '../snake/snake-renderer';
 import { renderFood, initializeFoodRenderer, cleanupFoodRenderer, getFoodRenderingContext } from '../food/food-renderer';
 import { hasFoodAtPosition, consumeFood } from '../food/food-state';
+import { detectCollision } from '../collision/collision-detector';
+import { renderGameOverOverlay } from '../collision/game-over-overlay';
 import type { GridRenderMetrics } from '../grid/grid-constants';
 import { renderGridBackground, renderGridLines } from '../grid/grid-renderer';
 
 const MOVEMENT_TICK_INTERVAL_IN_MILLISECONDS = 1000;
+const RESTART_DELAY_IN_MILLISECONDS = 1500;
 
 let gameLoopInterval: number | null = null;
 let currentMetrics: GridRenderMetrics | null = null;
@@ -67,6 +70,8 @@ export function cleanupGameLoop(): void {
 function executeMovementTick(): void {
   if (gameState === null || currentMetrics === null) return;
   
+  if (gameState.gameStatus === 'game-over') return;
+  
   const currentSnakeState = getCurrentSnakeState();
   if (currentSnakeState === null) return;
   
@@ -84,6 +89,33 @@ function executeMovementTick(): void {
       ...gameState,
       snakeState: movedState
     };
+  }
+  
+  const collisionResult = detectCollision(gameState.snakeState.body);
+  if (collisionResult.hasCollision) {
+    gameState = {
+      ...gameState,
+      gameStatus: 'game-over'
+    };
+    updateSnakeState(gameState.snakeState);
+    (window as any).gameState = gameState;
+    
+    renderGridBackground(currentMetrics);
+    renderGridLines(currentMetrics);
+    renderSnake(gameState.snakeState.body, currentMetrics);
+    
+    if (gameState.foodState.position !== null) {
+      const context = getFoodRenderingContext();
+      if (context !== null) {
+        renderFood(context, gameState.foodState, currentMetrics);
+      }
+    }
+    
+    const overlayContext = getContext();
+    renderGameOverOverlay(overlayContext, currentMetrics.totalGridWidth, currentMetrics.totalGridHeight);
+    
+    setTimeout(handleGameOver, RESTART_DELAY_IN_MILLISECONDS);
+    return;
   }
   
   if (gameState.foodState.position !== null) {
@@ -108,6 +140,26 @@ function executeMovementTick(): void {
     const context = getFoodRenderingContext();
     if (context !== null) {
       renderFood(context, gameState.foodState, currentMetrics);
+    }
+  }
+}
+
+function handleGameOver(): void {
+  gameState = restartGame();
+  initializeKeyboardInput(gameState.snakeState);
+  updateSnakeState(gameState.snakeState);
+  (window as any).gameState = gameState;
+  
+  if (currentMetrics !== null) {
+    renderGridBackground(currentMetrics);
+    renderGridLines(currentMetrics);
+    renderSnake(gameState.snakeState.body, currentMetrics);
+    
+    if (gameState.foodState.position !== null) {
+      const context = getFoodRenderingContext();
+      if (context !== null) {
+        renderFood(context, gameState.foodState, currentMetrics);
+      }
     }
   }
 }
