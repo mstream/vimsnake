@@ -144,17 +144,26 @@ function executeMovementTick(): void {
   }
 }
 
+function clearFullCanvas(): void {
+  const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+  if (canvas === null) return;
+  const context = canvas.getContext('2d');
+  if (context === null) return;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 function handleGameOver(): void {
   gameState = restartGame();
   initializeKeyboardInput(gameState.snakeState);
   updateSnakeState(gameState.snakeState);
   (window as any).gameState = gameState;
-  
+
   if (currentMetrics !== null) {
+    clearFullCanvas();
     renderGridBackground(currentMetrics);
     renderGridLines(currentMetrics);
     renderSnake(gameState.snakeState.body, currentMetrics);
-    
+
     if (gameState.foodState.position !== null) {
       const context = getFoodRenderingContext();
       if (context !== null) {
